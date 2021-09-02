@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from typing import Dict
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, Session
 from sqlalchemy.ext.automap import automap_base
@@ -9,8 +10,8 @@ from .base import LazyComponent
 class Database(object):
     Base = declarative_base()
 
-    def __init__(self):
-        conf = settings.POSTGRES
+    def __init__(self, name: str = 'default'):
+        conf = settings.POSTGRES[name]
         url = 'postgresql://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}'.format(**conf)
 
         pool_size = settings.SQLALCHEMY_POOL_SIZE or 5
@@ -35,8 +36,33 @@ class Database(object):
         return self.get_session()
 
 
+class DatabaseProxy(object):
+
+    def __init__(self):
+        self.holder: Dict[str, Database] = dict()
+
+    def register(self, name):
+        db = Database(name)
+        self.holder[name] = db
+
+    def get(self, name: str = 'default') -> Database:
+        return self.holder[name]
+
+    def __getattr__(self, item):
+        if item in self.holder:
+            return self.get(item)
+
+        conn = self.get()
+        return getattr(conn, item)
+
+
 class ComponentDatabase(LazyComponent):
     NAME = 'db'
 
     def _setup(self):
-        self._wrapped = Database()
+        proxy = DatabaseProxy()
+        conf = settings.POSTGRES
+        for name in conf.keys():
+            proxy.register(name)
+
+        self._wrapped = proxy

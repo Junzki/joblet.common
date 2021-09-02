@@ -4,11 +4,13 @@
 DEBUG: bool = False
 
 POSTGRES = {
-    'HOST': '',
-    'PORT': '',
-    'USER': '',
-    'PASSWORD': '',
-    'DBNAME': ''
+    'default': {
+        'HOST': '',
+        'PORT': '',
+        'USER': '',
+        'PASSWORD': '',
+        'DBNAME': ''
+    }
 }
 
 # Enable SQLAlchemy's "automap".

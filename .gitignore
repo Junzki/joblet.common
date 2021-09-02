@@ -116,4 +116,5 @@ venv.bak/
 Makefile
 
 # Local environment
-settings/settings_local.py
+locald/
+settings_local.py

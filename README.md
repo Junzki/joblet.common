@@ -8,11 +8,20 @@ First, add a `settings.py`, like this:
 ```python
 # settings.py
 POSTGRES = {
-    'HOST': '127.0.0.1',
-    'PORT': 5432,
-    'USER': 'some-user',
-    'PASSWORD': 'some-password',
-    'DBNAME': 'some-database'
+    'default': {
+        'HOST': '127.0.0.1',
+        'PORT': 5432,
+        'USER': 'some-user',
+        'PASSWORD': 'some-password',
+        'DBNAME': 'some-database'
+    },
+    'other': {
+        'HOST': '127.0.0.1',
+        'PORT': 5432,
+        'USER': 'some-user',
+        'PASSWORD': 'some-password',
+        'DBNAME': 'some-database'
+    }
 }
 ```
 
@@ -31,6 +40,9 @@ from common.holder import Holder
 holder = Holder()  # Initialize global holder
 
 db = holder.db  # Invoke managed database connection (SQLAlchemy Engine)
+                # Select "default" database by default.
+
+other_db = holder.db.other  # Invoke managed database named "other" in settings.POSTGRES
 
 # Write some model.
 class SomeModel(db.Base):
@@ -44,13 +56,12 @@ db.session.query(SomeModel).filter(SomeModel.name == "some-value")
 
 ## Supported components, and TODOs.
 #### Supported
-- PostgreSQL 
+- PostgreSQL (Allow setting up multiple databases, and will be routed by name.)
 
 #### TODOs
 
 **Project core**
 - Plugable component manager.
-- Multiple database support.
 
 **Plugable components**
 - MongoDB
