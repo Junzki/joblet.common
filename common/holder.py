@@ -1,9 +1,15 @@
 # -*- coding:utf-8 -*-
+import importlib
 from typing import Dict, Optional
+from common.utils.module_loading import import_string
 from .conf import settings
 from .components import LazyComponent
 from .components.database import ComponentDatabase
 from .exceptions import BadComponentKey, ComponentConflict, ComponentNotRegistered
+
+BUILTIN_COMPONENTS = {
+    'database': ComponentDatabase
+}
 
 
 class Holder(object):
@@ -11,7 +17,29 @@ class Holder(object):
     def __init__(self):
         self.settings = settings
         self.components: Dict[str, LazyComponent] = dict()
-        self.register_component(ComponentDatabase)
+
+        for name in self.settings.REQUIRED_COMPONENTS:
+            if name in BUILTIN_COMPONENTS:
+                klass = BUILTIN_COMPONENTS[name]
+                self.register_component(klass)
+                continue
+
+            try:
+                mod = importlib.import_module(name)
+            except ImportError:
+                klass = import_string(name)
+                self.register_component(klass)
+                continue
+
+            for obj_name in dir(mod):
+                if obj_name.startswith('_'):
+                    continue
+
+                obj = getattr(mod, obj_name)
+                if type(obj) is type and issubclass(obj, LazyComponent):
+                    self.register_component(obj)
+                elif isinstance(obj, LazyComponent):
+                    self.register_component(type(obj))
 
     @staticmethod
     def get_component_key(k: str) -> str:

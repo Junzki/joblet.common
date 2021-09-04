@@ -6,10 +6,14 @@ from common.exceptions import ImproperlyConfigured
 from common.utils.functional import LazyObject
 from . import default_settings
 
-ENV_KEY = 'JOBLET_CONFIG'
+ENVIRONMENT_VARIABLE = 'JOBLET_CONFIG'
 
 
 class Settings(object):
+
+    TUPLE_SETTINGS = (
+        'REQUIRED_COMPONENTS',
+    )
 
     def __init__(self, settings_module):
         for setting in dir(default_settings):
@@ -28,7 +32,7 @@ class Settings(object):
 class LazySettings(LazyObject):
 
     def _setup(self):
-        settings_module = os.environ.get(ENV_KEY)
+        settings_module = os.environ.get(ENVIRONMENT_VARIABLE)
         if not settings_module:
             raise ImproperlyConfigured("Settings are not configured.")
 
