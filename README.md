@@ -61,9 +61,9 @@ db.session.query(SomeModel).filter(SomeModel.name == "some-value")
 #### TODOs
 
 **Project core**
-- Plugable component manager.
+- Pluggable component manager.
 
-**Plugable components**
+**Pluggable components**
 - MongoDB
 - Redis
 - API Server (RESTful or/and RPC)

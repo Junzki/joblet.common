@@ -53,3 +53,6 @@ class Holder(object):
 
     def __getitem__(self, item):
         return self.get_component(item)
+
+
+holder = Holder()
