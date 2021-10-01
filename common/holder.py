@@ -76,6 +76,21 @@ class Holder(object):
 
         return found
 
+    def shell(self):
+        try:
+            import IPython
+            shell = IPython.terminal.embed.InteractiveShellEmbed()
+            shell(local_ns={
+                'holder': self
+            })
+
+        except ImportError:
+            # IPython not installed.
+            import code
+            code.interact(local={
+                'holder': self
+            })
+
     def __getattr__(self, item: str):
         return self.get_component(item)
 

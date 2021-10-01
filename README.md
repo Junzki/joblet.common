@@ -7,7 +7,12 @@ First, add a `settings.py`, like this:
 
 ```python
 # settings.py
-POSTGRES = {
+
+REQUIRED_COMPONENTS = (
+    'database',
+)
+
+DATABASES = {
     'default': {
         'HOST': '127.0.0.1',
         'PORT': 5432,
@@ -42,7 +47,7 @@ holder = Holder()  # Initialize global holder
 db = holder.db  # Invoke managed database connection (SQLAlchemy Engine)
                 # Select "default" database by default.
 
-other_db = holder.db.other  # Invoke managed database named "other" in settings.POSTGRES
+other_db = holder.db.other  # Invoke managed database named "other" in settings.DATABASES
 
 # Write some model.
 class SomeModel(db.Base):
@@ -51,17 +56,18 @@ class SomeModel(db.Base):
 
 # Do query
 db.session.query(SomeModel).filter(SomeModel.name == "some-value")
+
+# Launch interactive shell
+holder.shell()
 ```
 
 
 ## Supported components, and TODOs.
 #### Supported
-- PostgreSQL (Allow setting up multiple databases, and will be routed by name.)
+- SQLAlchemy supported databases.
+
 
 #### TODOs
-
-**Project core**
-- Pluggable component manager.
 
 **Pluggable components**
 - MongoDB
