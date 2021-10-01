@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
+import urllib.parse
 from typing import Dict, Any, Optional
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, Session
@@ -25,7 +26,14 @@ class Database(object):
         if schema.startswith('sqlite'):
             self._url = '{schema}:///{DBNAME}'.format(schema=schema, **conf)
         else:
+            params = conf.pop('PARAMS', None)
+            if params:
+                params = urllib.parse.urlencode(params)
+
             self._url = '{schema}://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}'.format(schema=schema, **conf)
+            if params:
+                self._url = '?'.join((self._url, params))
+
             self.options.update(dict(
                 pool_size=settings.SQLALCHEMY_POOL_SIZE or DEFAULT_SQLALCHEMY_POOL_SIZE,
                 max_overflow=settings.SQLALCHEMY_POOL_MAX_OVERFLOW or DEFAULT_SQLALCHEMY_POOL_MAX_OVERFLOW,
